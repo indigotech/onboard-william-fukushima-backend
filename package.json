@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/indigotech/onboard-william-fukushima-backend#readme",
   "dependencies": {
+    "apollo-server": "^2.24.0",
     "graphql": "^15.5.0"
   }
 }
