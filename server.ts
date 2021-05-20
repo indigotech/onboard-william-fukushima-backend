@@ -2,9 +2,7 @@ import "reflect-metadata";
 import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
 
-
 const { ApolloServer, gql } = require("apollo-server");
-
 
 const typeDefs = gql`
   type Hello {
@@ -16,23 +14,21 @@ const typeDefs = gql`
   }
 
   type UserType {
-    id: Int!,
-    name: String!,
-    email: String!,
-    password: String!,
+    id: Int!
+    name: String!
+    email: String!
+    password: String!
     birthDate: String!
   }
 
   type Mutation {
     createUser(
-        name: String!,
-        email: String!,
-        password: String!,
-        birthDate: String! 
-        ): UserType!
-        
+      name: String!
+      email: String!
+      password: String!
+      birthDate: String!
+    ): UserType!
   }
-
 `;
 const hello = [
   {
@@ -47,50 +43,53 @@ class ValidationError extends Error {
   }
 }
 
-
 const EMAIL_REGEX = /([a-z0-9])+@([a-z0-9])+.com/;
 const PASSWORD_REGEX = /(?=.*[0-9])(?=.*([A-Za-z])).{7,}/;
-const BIRTHDATE_REGEX = /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
+const BIRTHDATE_REGEX =
+  /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
 
 createConnection();
 
 const resolvers = {
   Query: {
-    hello : () => hello,
+    hello: () => hello,
   },
   Mutation: {
-    createUser: async ( _, args ) => {
-try{
-      console.log("Inserting a new user into the database...");
-      const user = new User();
-      user.name = args.name;
-      if(EMAIL_REGEX.test(args.email)){
-        user.email = args.email;
-      } else throw new ValidationError("E-mail inválido.");
-      if(PASSWORD_REGEX.test(args.password)){
-        user.password = args.password;
-      } else throw new ValidationError("Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.");
-      if(BIRTHDATE_REGEX.test(args.birthDate)){
-        user.birthDate = args.birthDate;
-      } else throw new ValidationError("Data de Nascimento deve estar no formato yyyy-mm-dd");
-      await getConnection().manager.save(user);
-      console.log("Saved a new user with id: " + user.id);
-      console.log("Loading users from the database...");
-      const users = await getConnection().manager.find(User);
-      console.log("Loaded users: ", users);
+    createUser: async (_, args) => {
+      try {
+        console.log("Inserting a new user into the database...");
+        const user = new User();
+        user.name = args.name;
+        if (EMAIL_REGEX.test(args.email)) {
+          user.email = args.email;
+        } else throw new ValidationError("E-mail inválido.");
+        if (PASSWORD_REGEX.test(args.password)) {
+          user.password = args.password;
+        } else
+          throw new ValidationError(
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
+          );
+        if (BIRTHDATE_REGEX.test(args.birthDate)) {
+          user.birthDate = args.birthDate;
+        } else
+          throw new ValidationError(
+            "Data de Nascimento deve estar no formato yyyy-mm-dd"
+          );
+        await getConnection().manager.save(user);
+        console.log("Saved a new user with id: " + user.id);
+        console.log("Loading users from the database...");
+        const users = await getConnection().manager.find(User);
+        console.log("Loaded users: ", users);
 
-      return user;
-    }
-    catch(err){
-      return err;
-    }
-    }
-  }
+        return user;
+      } catch (err) {
+        return err;
+      }
+    },
+  },
 };
 
-
 const server = new ApolloServer({ typeDefs, resolvers });
-
 
 server.listen().then(({ url }: any) => {
   console.log(`🚀  Server ready at ${url}`);
