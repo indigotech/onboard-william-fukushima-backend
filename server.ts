@@ -3,7 +3,7 @@ import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
 
 const { ApolloServer, gql } = require("apollo-server");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const typeDefs = gql`
@@ -64,20 +64,24 @@ const BIRTHDATE_REGEX =
         user.name = args.name;
         if (EMAIL_REGEX.test(args.email)) {
           user.email = args.email;
-        } else throw new ValidationError("E-mail inválido.");
+        } else {
+          throw new ValidationError("E-mail inválido.");
+        }
         if (PASSWORD_REGEX.test(args.password)) {
           user.salt = bcrypt.genSaltSync(saltRounds);
           user.password = bcrypt.hashSync(args.password, user.salt);
-        } else
+        } else {
           throw new ValidationError(
             "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
           );
+        }
         if (BIRTHDATE_REGEX.test(args.birthDate)) {
           user.birthDate = args.birthDate;
-        } else
+        } else {
           throw new ValidationError(
             "Data de Nascimento deve estar no formato yyyy-mm-dd"
           );
+        }
         return getConnection().manager.save(user);
       },
     },
