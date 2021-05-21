@@ -16,6 +16,9 @@ export class User {
     password: string;
 
     @Column()
+    salt: string;
+
+    @Column()
     birthDate: string;
 
 }

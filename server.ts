@@ -3,6 +3,8 @@ import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
 
 const { ApolloServer, gql } = require("apollo-server");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const typeDefs = gql`
   type Hello {
@@ -17,6 +19,7 @@ const typeDefs = gql`
     id: Int!
     name: String!
     email: String!
+    salt: String!
     password: String!
     birthDate: String!
   }
@@ -63,7 +66,8 @@ const BIRTHDATE_REGEX =
           user.email = args.email;
         } else throw new ValidationError("E-mail inválido.");
         if (PASSWORD_REGEX.test(args.password)) {
-          user.password = args.password;
+          user.salt = bcrypt.genSaltSync(saltRounds);
+          user.password = bcrypt.hashSync(args.password, user.salt);
         } else
           throw new ValidationError(
             "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
