@@ -1,12 +1,11 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
 
 const { ApolloServer, gql } = require("apollo-server");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
 const typeDefs = gql`
   type Hello {
     hello: String
@@ -17,60 +16,80 @@ const typeDefs = gql`
   }
 
   type UserType {
-    id: Int!,
-    name: String!,
-    email: String!,
-    password: String!,
+    id: Int!
+    name: String!
+    email: String!
+    salt: String!
+    password: String!
     birthDate: String!
   }
 
   type Mutation {
     createUser(
-        name: String!,
-        email: String!,
-        password: String!,
-        birthDate: String! 
-        ): UserType!
-        
+      name: String!
+      email: String!
+      password: String!
+      birthDate: String!
+    ): UserType!
   }
-
 `;
 const hello = [
   {
     hello: "Hello World!",
   },
 ];
-// Resolvers define the technique for fetching the types defined in the
-// schema. This resolver retrieves books from the "books" array above.
-const resolvers = {
-  Query: {
-    hello : () => hello,
-  },
-  Mutation: {
-    createUser: ( _, args ) => createConnection().then(async connection => {
 
-      console.log("Inserting a new user into the database...");
-      const user = new User();
-      user.name = args.name;
-      user.email = args.email;
-      user.password = args.password;
-      user.birthDate = args.birthDate;
-      await connection.manager.save(user);
-      console.log("Saved a new user with id: " + user.id);
-  
-      console.log("Loading users from the database...");
-      const users = await connection.manager.find(User);
-      console.log("Loaded users: ", users);
-      connection.close();
-      return user;
-    })
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ValidationError";
   }
-};
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
-const server = new ApolloServer({ typeDefs, resolvers });
+}
 
-// The `listen` method launches a web server.
-server.listen().then(({ url }: any) => {
-  console.log(`🚀  Server ready at ${url}`);
-});
+const EMAIL_REGEX = /([a-z0-9])+@([a-z0-9])+.com/;
+const PASSWORD_REGEX = /(?=.*[0-9])(?=.*([A-Za-z])).{7,}/;
+const BIRTHDATE_REGEX =
+  /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
+
+(async function setup() {
+  await createConnection();
+
+  const resolvers = {
+    Query: {
+      hello: () => hello,
+    },
+    Mutation: {
+      createUser: async (_, args) => {
+        const user = new User();
+        user.name = args.name;
+        if (EMAIL_REGEX.test(args.email)) {
+          user.email = args.email;
+        } else {
+          throw new ValidationError("E-mail inválido.");
+        }
+        if (PASSWORD_REGEX.test(args.password)) {
+          user.salt = bcrypt.genSaltSync(saltRounds);
+          user.password = bcrypt.hashSync(args.password, user.salt);
+        } else {
+          throw new ValidationError(
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
+          );
+        }
+        if (BIRTHDATE_REGEX.test(args.birthDate)) {
+          user.birthDate = args.birthDate;
+        } else {
+          throw new ValidationError(
+            "Data de Nascimento deve estar no formato yyyy-mm-dd"
+          );
+        }
+        return getConnection().manager.save(user);
+      },
+    },
+  };
+
+  const server = new ApolloServer({ typeDefs, resolvers });
+
+  server.listen().then(({ url }: any) => {
+    console.log(`🚀  Server ready at ${url}`);
+  });
+})();

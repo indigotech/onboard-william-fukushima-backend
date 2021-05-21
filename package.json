@@ -19,11 +19,12 @@
    "homepage": "https://github.com/indigotech/onboard-william-fukushima-backend#readme",
    "dependencies": {
       "apollo-server": "2.24.0",
+      "bcrypt": "5.0.1",
       "graphql": "15.5.0",
+      "mysql": "2.14.1",
       "pg": "8.6.0",
       "reflect-metadata": "0.1.10",
-      "typeorm": "0.2.32",
-      "mysql": "2.14.1"
+      "typeorm": "0.2.32"
    },
    "devDependencies": {
       "@types/node": "8.0.29",
