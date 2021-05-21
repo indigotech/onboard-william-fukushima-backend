@@ -77,10 +77,6 @@ const BIRTHDATE_REGEX =
               "Data de Nascimento deve estar no formato yyyy-mm-dd"
             );
           await getConnection().manager.save(user);
-          console.log("Saved a new user with id: " + user.id);
-          console.log("Loading users from the database...");
-          const users = await getConnection().manager.find(User);
-          console.log("Loaded users: ", users);
 
           return user;
       },
