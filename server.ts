@@ -1,5 +1,6 @@
+import { Server } from "http";
 import "reflect-metadata";
-import { createConnection, getConnection } from "typeorm";
+import { createConnection, getConnection} from "typeorm";
 import { User } from "./src/entity/User";
 
 const { ApolloServer, gql } = require("apollo-server");
@@ -33,11 +34,10 @@ const typeDefs = gql`
     ): UserType!
   }
 `;
-const hello = [
+const hello = 
   {
     hello: "Hello World!",
-  },
-];
+  };
 
 class ValidationError extends Error {
   constructor(message) {
@@ -51,7 +51,7 @@ const PASSWORD_REGEX = /(?=.*[0-9])(?=.*([A-Za-z])).{7,}/;
 const BIRTHDATE_REGEX =
   /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
 
-(async function setup() {
+export async function setup() {
   await createConnection();
 
   const resolvers = {
@@ -67,7 +67,11 @@ const BIRTHDATE_REGEX =
         } else {
           throw new ValidationError("E-mail inválido.");
         }
+<<<<<<< HEAD
         if (PASSWORD_REGEX.test(args.password)) {
+=======
+          if (PASSWORD_REGEX.test(args.password)) {
+>>>>>>> 3d0a75a (Added tests setup and scripts.)
           user.salt = bcrypt.genSaltSync(saltRounds);
           user.password = bcrypt.hashSync(args.password, user.salt);
         } else {
@@ -89,7 +93,7 @@ const BIRTHDATE_REGEX =
 
   const server = new ApolloServer({ typeDefs, resolvers });
 
-  server.listen().then(({ url }: any) => {
+  await server.listen().then(({ url }: any) => {
     console.log(`🚀  Server ready at ${url}`);
   });
-})();
+}
