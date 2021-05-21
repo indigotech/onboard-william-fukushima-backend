@@ -48,9 +48,7 @@ const PASSWORD_REGEX = /(?=.*[0-9])(?=.*([A-Za-z])).{7,}/;
 const BIRTHDATE_REGEX =
   /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
 
-
 (async function setup() {
-
   await createConnection();
 
   const resolvers = {
@@ -59,26 +57,26 @@ const BIRTHDATE_REGEX =
     },
     Mutation: {
       createUser: async (_, args) => {
-          const user = new User();
-          user.name = args.name;
-          if (EMAIL_REGEX.test(args.email)) {
-            user.email = args.email;
-          } else throw new ValidationError("E-mail inválido.");
-          if (PASSWORD_REGEX.test(args.password)) {
-            user.password = args.password;
-          } else
-            throw new ValidationError(
-              "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
-            );
-          if (BIRTHDATE_REGEX.test(args.birthDate)) {
-            user.birthDate = args.birthDate;
-          } else
-            throw new ValidationError(
-              "Data de Nascimento deve estar no formato yyyy-mm-dd"
-            );
-          await getConnection().manager.save(user);
+        const user = new User();
+        user.name = args.name;
+        if (EMAIL_REGEX.test(args.email)) {
+          user.email = args.email;
+        } else throw new ValidationError("E-mail inválido.");
+        if (PASSWORD_REGEX.test(args.password)) {
+          user.password = args.password;
+        } else
+          throw new ValidationError(
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
+          );
+        if (BIRTHDATE_REGEX.test(args.birthDate)) {
+          user.birthDate = args.birthDate;
+        } else
+          throw new ValidationError(
+            "Data de Nascimento deve estar no formato yyyy-mm-dd"
+          );
+        await getConnection().manager.save(user);
 
-          return user;
+        return user;
       },
     },
   };
