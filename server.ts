@@ -1,6 +1,6 @@
 import { Server } from "http";
 import "reflect-metadata";
-import { createConnection, getConnection} from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
 
 const { ApolloServer, gql } = require("apollo-server");
@@ -34,10 +34,9 @@ const typeDefs = gql`
     ): UserType!
   }
 `;
-const hello = 
-  {
-    hello: "Hello World!",
-  };
+const hello = {
+  hello: "Hello World!",
+};
 
 class ValidationError extends Error {
   constructor(message) {
@@ -68,10 +67,14 @@ export async function setup() {
           throw new ValidationError("E-mail inválido.");
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (PASSWORD_REGEX.test(args.password)) {
 =======
           if (PASSWORD_REGEX.test(args.password)) {
 >>>>>>> 3d0a75a (Added tests setup and scripts.)
+=======
+        if (PASSWORD_REGEX.test(args.password)) {
+>>>>>>> 6086739 (Added tests setup and scripts.)
           user.salt = bcrypt.genSaltSync(saltRounds);
           user.password = bcrypt.hashSync(args.password, user.salt);
         } else {
