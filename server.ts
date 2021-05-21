@@ -74,9 +74,7 @@ const BIRTHDATE_REGEX =
           throw new ValidationError(
             "Data de Nascimento deve estar no formato yyyy-mm-dd"
           );
-        await getConnection().manager.save(user);
-
-        return user;
+        return await getConnection().manager.save(user);
       },
     },
   };
