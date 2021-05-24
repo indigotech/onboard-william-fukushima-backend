@@ -4,12 +4,25 @@ import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
 import { ApolloServer, gql } from "apollo-server";
 import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
+import { isDefinitionNode } from "graphql";
 
 const saltRounds = 10;
 
 const typeDefs = gql`
   type Hello {
     hello: String
+  }
+
+  type LoginUserType {
+    id: Int!
+    name: String!
+    email: String!
+    birthDate: String!
+  }
+  type LoginResponse {
+    user: LoginUserType!
+    token: String!
   }
 
   type Query {
@@ -32,6 +45,8 @@ const typeDefs = gql`
       password: String!
       birthDate: String!
     ): UserType!
+
+    login(email: String!, password: String!): LoginResponse!
   }
 `;
 const hello = {
@@ -92,17 +107,53 @@ export async function setup() {
           user.password = bcrypt.hashSync(args.password, user.salt);
         } else {
           throw new ValidationError(
-            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.", 400
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.",
+            400
           );
         }
         if (BIRTHDATE_REGEX.test(args.birthDate)) {
           user.birthDate = args.birthDate;
         } else {
           throw new ValidationError(
-            "Data de Nascimento deve estar no formato yyyy-mm-dd", 400
+            "Data de Nascimento deve estar no formato yyyy-mm-dd",
+            400
           );
         }
         return getConnection().manager.save(user);
+      },
+      login: async (_, args) => {
+        if (EMAIL_REGEX.test(args.email)) {
+        } else {
+          throw new ValidationError("E-mail inválido.", 400);
+        }
+        if (PASSWORD_REGEX.test(args.password)) {
+        } else {
+          throw new ValidationError(
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.",
+            400
+          );
+        }
+        const user: any = (
+          await getConnection().manager.find("user", { email: args.email })
+        )[0];
+        var token: String = "";
+
+        if (user) {
+          const password: any = await bcrypt.hashSync(args.password, user.salt);
+          if (password == user.password) {
+            token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+              expiresIn: "2h",
+            });
+          } else {
+            throw new ValidationError("Credenciais inválidas.", 400);
+          }
+        } else {
+          throw new ValidationError("Credenciais inválidas.", 400);
+        }
+        return {
+          user: user,
+          token: token,
+        };
       },
     },
   };
