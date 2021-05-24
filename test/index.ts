@@ -73,3 +73,150 @@ describe("createUser Mutation", () => {
     expect(response.body.data.createUser.birthDate).to.equal("2001-08-03");
   });
 });
+
+const DUPLICATE_ERROR_TEXT = /duplicate key value violates unique constraint.*/;
+
+describe("createUser Mutation", () => {
+  it("Should create a duplicate user in the database.", async () => {
+    const response1 = await request("localhost:4000")
+      .post("/")
+      .send({
+        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
+        createUser(
+          name: $name,
+          email: $email,
+          password: $password,
+          birthDate: $birthDate)
+        {
+          id
+          name
+          email
+          password
+          birthDate
+        }
+      }`,
+        variables: {
+          name: "a",
+          email: "amdi@asdfasdf.com",
+          password: "1234asfdf",
+          birthDate: "2001-08-03",
+        },
+      });
+    const response2 = await request("localhost:4000")
+      .post("/")
+      .send({
+        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
+        createUser(
+          name: $name,
+          email: $email,
+          password: $password,
+          birthDate: $birthDate)
+        {
+          id
+          name
+          email
+          password
+          birthDate
+        }
+      }`,
+        variables: {
+          name: "a",
+          email: "amdi@asdfasdf.com",
+          password: "1234asfdf",
+          birthDate: "2001-08-03",
+        },
+      });
+    console.log(response2.body.errors[0].message);
+    expect(DUPLICATE_ERROR_TEXT.test(response2.body.errors[0].message)).to.equal(
+      true
+    );
+  });
+});
+
+describe("createUser Mutation", () => {
+  it("Should Fail to create users - E-mail Error.", async () => {
+    const response = await request("localhost:4000")
+      .post("/")
+      .send({
+        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
+        createUser(
+          name: $name,
+          email: $email,
+          password: $password,
+          birthDate: $birthDate)
+        {
+          id
+          name
+          email
+          password
+          birthDate
+        }
+      }`,
+        variables: {
+          name: "a",
+          email: "amdiasdfasdf",
+          password: "1234asfdf",
+          birthDate: "2001-08-03",
+        },
+      });
+    expect(response.body.errors[0].message).to.equal("E-mail inválido.");
+  });
+  it("Should Fail to create users - Password Error.", async () => {
+    const response = await request("localhost:4000")
+      .post("/")
+      .send({
+        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
+      createUser(
+        name: $name,
+        email: $email,
+        password: $password,
+        birthDate: $birthDate)
+      {
+        id
+        name
+        email
+        password
+        birthDate
+      }
+    }`,
+        variables: {
+          name: "a",
+          email: "amdi@asdfasdf.com",
+          password: "12345",
+          birthDate: "2001-08-03",
+        },
+      });
+    expect(response.body.errors[0].message).to.equal(
+      "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
+    );
+  });
+  it("Should Fail to create users - Birth Date Error.", async () => {
+    const response = await request("localhost:4000")
+      .post("/")
+      .send({
+        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
+      createUser(
+        name: $name,
+        email: $email,
+        password: $password,
+        birthDate: $birthDate)
+      {
+        id
+        name
+        email
+        password
+        birthDate
+      }
+    }`,
+        variables: {
+          name: "a",
+          email: "amdi@asdfasdf.com",
+          password: "1234asfdf",
+          birthDate: "2001/08/03",
+        },
+      });
+    expect(response.body.errors[0].message).to.equal(
+      "Data de Nascimento deve estar no formato yyyy-mm-dd"
+    );
+  });
+});

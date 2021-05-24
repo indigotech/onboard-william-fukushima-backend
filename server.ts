@@ -39,10 +39,12 @@ const hello = {
 };
 
 class ValidationError extends Error {
-  constructor(message) {
+  constructor(message, code) {
     super(message);
+    this.code = code;
     this.name = "ValidationError";
   }
+  code = 0;
 }
 
 const EMAIL_REGEX = /([a-z0-9])+@([a-z0-9])+.com/;
@@ -83,21 +85,21 @@ export async function setup() {
         if (EMAIL_REGEX.test(args.email)) {
           user.email = args.email;
         } else {
-          throw new ValidationError("E-mail inválido.");
+          throw new ValidationError("E-mail inválido.", 400);
         }
         if (PASSWORD_REGEX.test(args.password)) {
           user.salt = bcrypt.genSaltSync(saltRounds);
           user.password = bcrypt.hashSync(args.password, user.salt);
         } else {
           throw new ValidationError(
-            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.", 400
           );
         }
         if (BIRTHDATE_REGEX.test(args.birthDate)) {
           user.birthDate = args.birthDate;
         } else {
           throw new ValidationError(
-            "Data de Nascimento deve estar no formato yyyy-mm-dd"
+            "Data de Nascimento deve estar no formato yyyy-mm-dd", 400
           );
         }
         return getConnection().manager.save(user);
