@@ -89,7 +89,6 @@ export async function setup() {
 
   const server = new ApolloServer({ typeDefs, resolvers });
 
-  await server.listen().then(({ url }: any) => {
-    console.log(`🚀  Server ready at ${url}`);
-  });
+  const { url } = await server.listen();
+  console.log(`🚀  Server ready at ${url}`);
 }
