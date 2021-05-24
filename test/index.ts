@@ -14,15 +14,11 @@ const expect = chai.expect;
 
 before(async () => {
   await setup();
-  await getConnection()
-  .manager
-  .clear("User");
+  await getConnection().manager.clear("User");
 });
 
 beforeEach(async () => {
-  await getConnection()
-    .manager
-    .clear("User");
+  await getConnection().manager.clear("User");
 });
 
 describe("Hello World Query", () => {
