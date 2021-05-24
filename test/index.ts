@@ -1,34 +1,32 @@
+import * as dotenv from "dotenv";
+
+dotenv.config({ path: './test.env' });
+
 import { setup } from "../server";
 
-const assert = require("assert");
-const request = require("supertest");
-const { gql } = require("apollo-server");
+import * as assert from "assert";
+import * as request from "supertest"
+import { gql } from "apollo-server";
+import * as chai from "chai";
 
+const expect = chai.expect;
 
 before(async () => {
   await setup();
 });
 
-describe("Hello World Query", function () {
-  it("Should respond with Hello World! json object", function (done) {
-    request("localhost:4000")
-      .post("/")
-      .send({
+describe("Hello World Query", () => {
+  it("Should respond with Hello World! json object", async () => {
+    const response = await request("localhost:4000").post("/").send(
+      {
         query: `query hello{
         hello{
            hello
           }
-        }`,
-      })
-      .set("Accept", "application/json")
-      .expect(
-        200,
-        {
-          data: {
-            hello: { hello: "Hello World!" },
-          },
-        },
-        done
-      );
+        }`
+      }
+    );
+    await expect(response.statusCode).to.equal(200);
+    await expect(response.body).to.have.property('data').to.have.property("hello").to.have.property("hello").to.equal("Hello World!");
   });
 });

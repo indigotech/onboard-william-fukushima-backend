@@ -21,6 +21,7 @@
    "dependencies": {
       "apollo-server": "2.24.0",
       "bcrypt": "5.0.1",
+      "dotenv": "^10.0.0",
       "graphql": "15.5.0",
       "mysql": "2.14.1",
       "pg": "8.6.0",
@@ -28,8 +29,9 @@
       "typeorm": "0.2.32"
    },
    "devDependencies": {
-      "@types/mocha": "^8.2.2",
+      "@types/mocha": "8.2.2",
       "@types/node": "8.0.29",
+      "chai": "4.3.4",
       "mocha": "8.4.0",
       "nodemon": "2.0.7",
       "supertest": "^6.1.3",
