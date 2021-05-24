@@ -46,7 +46,11 @@ const typeDefs = gql`
       birthDate: String!
     ): UserType!
 
-    login(email: String!, password: String!): LoginResponse!
+    login(
+      email: String!
+      password: String!
+      rememberMe: Boolean = false
+    ): LoginResponse!
   }
 `;
 const hello = {
@@ -58,6 +62,15 @@ class ValidationError extends Error {
     super(message);
     this.code = code;
     this.name = "ValidationError";
+  }
+  code = 0;
+}
+
+class BadCredentials extends Error {
+  constructor(message) {
+    super(message);
+    this.code = 401;
+    this.name = "BadCredentials";
   }
   code = 0;
 }
@@ -94,7 +107,7 @@ export async function setup() {
       hello: () => hello,
     },
     Mutation: {
-      createUser: async (_, args) => {
+      createUser: async (_, args, context) => {
         const user = new User();
         user.name = args.name;
         if (EMAIL_REGEX.test(args.email)) {
@@ -119,7 +132,15 @@ export async function setup() {
             400
           );
         }
-        return getConnection().manager.save(user);
+
+        return jwt.verify(context.authScope, process.env.JWT_SECRET, (err, decoded) => {
+          if (err) {
+            throw err;
+          }
+          else{
+            return getConnection().manager.save(user);
+          }
+        });
       },
       login: async (_, args) => {
         if (EMAIL_REGEX.test(args.email)) {
@@ -141,14 +162,15 @@ export async function setup() {
         if (user) {
           const password: any = await bcrypt.hashSync(args.password, user.salt);
           if (password == user.password) {
+            const expirationTime = args.rememberMe ? "2 hours" : "2 weeks";
             token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-              expiresIn: "2h",
+              expiresIn: expirationTime,
             });
           } else {
-            throw new ValidationError("Credenciais inválidas.", 400);
+            throw new BadCredentials("Credenciais inválidas.");
           }
         } else {
-          throw new ValidationError("Credenciais inválidas.", 400);
+          throw new BadCredentials("Credenciais inválidas.");
         }
         return {
           user: user,
@@ -158,7 +180,9 @@ export async function setup() {
     },
   };
 
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({ typeDefs, resolvers, context: ({ req }) => ({
+    authScope: req.headers.authorization
+  }) });
 
   const { url } = await server.listen();
   console.log(`🚀  Server ready at ${url}`);
