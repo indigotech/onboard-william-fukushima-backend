@@ -184,6 +184,15 @@ export async function setup() {
     authScope: req.headers.authorization
   }) });
 
+  const admin = new User();
+  process.env.ADMIN_PASS
+  admin.email = "admin@taqtile.com";
+  admin.name = "admin";
+  admin.birthDate = "2000-01-01";
+  admin.salt = bcrypt.genSaltSync(saltRounds);
+  admin.password = bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+  getConnection().manager.save(admin);
+
   const { url } = await server.listen();
   console.log(`🚀  Server ready at ${url}`);
 }
