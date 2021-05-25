@@ -20,7 +20,7 @@ before(async () => {
   await getConnection().manager.clear("User");
 
   const admin = new User();
-  process.env.ADMIN_PASS
+  process.env.ADMIN_PASS;
   admin.email = "admin@taqtile.com";
   admin.name = "admin";
   admin.birthDate = "2000-01-01";
@@ -52,9 +52,9 @@ describe("Hello World Query", () => {
 describe("login and createUser Mutations", () => {
   it("Should create a user in the database.", async () => {
     const loginResponse = await request("localhost:4000")
-    .post("/")
-    .send({
-      query: `
+      .post("/")
+      .send({
+        query: `
       mutation Login($email : String!, $password : String!, $rememberMe : Boolean){
         login(
           email: $email,
@@ -71,12 +71,12 @@ describe("login and createUser Mutations", () => {
             token
           }
       }`,
-      variables: {
-        email: "admin@taqtile.com",
-        password: process.env.ADMIN_PASS,
-        rememberMe: false
-      }
-    });
+        variables: {
+          email: "admin@taqtile.com",
+          password: process.env.ADMIN_PASS,
+          rememberMe: false,
+        },
+      });
     token = loginResponse.body.data.login.token;
     const response = await request("localhost:4000")
       .post("/")
@@ -100,11 +100,9 @@ describe("login and createUser Mutations", () => {
           email: "amdi@asdfasdf.com",
           password: "1234asfdf",
           birthDate: "2001-08-03",
-        }
+        },
       })
-      .set(
-        {'Authorization': token, 'Content-Type': 'application/json'}
-        );
+      .set({ Authorization: token, "Content-Type": "application/json" });
     expect(response.body.data.createUser.id).to.be.a("number");
     expect(response.body.data.createUser.name).to.equal("a");
     expect(response.body.data.createUser.email).to.equal("amdi@asdfasdf.com");
@@ -140,9 +138,7 @@ describe("login and createUser Mutations - Error cases", () => {
           birthDate: "2001-08-03",
         },
       })
-      .set(
-        {'Authorization': token, 'Content-Type': 'application/json'}
-        );
+      .set({ Authorization: token, "Content-Type": "application/json" });
     const response2 = await request("localhost:4000")
       .post("/")
       .send({
@@ -166,13 +162,12 @@ describe("login and createUser Mutations - Error cases", () => {
           password: "1234asfdf",
           birthDate: "2001-08-03",
         },
-      }).set(
-        {'Authorization': token, 'Content-Type': 'application/json'}
-        );
+      })
+      .set({ Authorization: token, "Content-Type": "application/json" });
     console.log(response2.body.errors[0].message);
-    expect(DUPLICATE_ERROR_TEXT.test(response2.body.errors[0].message)).to.equal(
-      true
-    );
+    expect(
+      DUPLICATE_ERROR_TEXT.test(response2.body.errors[0].message)
+    ).to.equal(true);
   });
 });
 
@@ -228,9 +223,8 @@ describe("createUser Mutation", () => {
           password: "12345",
           birthDate: "2001-08-03",
         },
-      }).set(
-        {'Authorization': token, 'Content-Type': 'application/json'}
-        );
+      })
+      .set({ Authorization: token, "Content-Type": "application/json" });
     expect(response.body.errors[0].message).to.equal(
       "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
     );
@@ -259,9 +253,8 @@ describe("createUser Mutation", () => {
           password: "1234asfdf",
           birthDate: "2001/08/03",
         },
-      }).set(
-        {'Authorization': token, 'Content-Type': 'application/json'}
-        );
+      })
+      .set({ Authorization: token, "Content-Type": "application/json" });
     expect(response.body.errors[0].message).to.equal(
       "Data de Nascimento deve estar no formato yyyy-mm-dd"
     );
