@@ -1,5 +1,5 @@
 require("dotenv").config();
 
-import { setup } from "./server";
+import { setup } from "./src/server";
 
 setup();
