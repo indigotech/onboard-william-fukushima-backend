@@ -2,8 +2,8 @@ import { getConnection } from "typeorm";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { ValidationError, BadCredentials } from "../errors";
-import { CompleteUserType } from "../dataTypes";
+import { ValidationError, BadCredentials } from "../types-and-classes/errors";
+import { CompleteUserType } from "../types-and-classes/dataTypes";
 
 const EMAIL_REGEX = /([a-z0-9])+@([a-z0-9])+.com/;
 const PASSWORD_REGEX = /(?=.*[0-9])(?=.*([A-Za-z])).{7,}/;

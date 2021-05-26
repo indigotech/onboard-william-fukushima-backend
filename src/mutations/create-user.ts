@@ -2,7 +2,7 @@ import { getConnection } from "typeorm";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { ValidationError } from "../errors";
+import { ValidationError } from "../types-and-classes/errors";
 
 const saltRounds = 10;
 

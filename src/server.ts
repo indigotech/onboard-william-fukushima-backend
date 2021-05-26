@@ -1,17 +1,15 @@
 import { Server } from "http";
 import "reflect-metadata";
-import { ContainerInterface, createConnection, DbOptions, getConnection, UseContainerOptions } from "typeorm";
+import { createConnection, DbOptions, getConnection } from "typeorm";
 import { User } from "./entity/User";
 import { ApolloServer, Config} from "apollo-server";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { isDefinitionNode } from "graphql";
-import { ValidationError, BadCredentials, NotFound } from "./errors";
+import { ValidationError, BadCredentials, NotFound } from "./types-and-classes/errors";
 import { resolvers } from "./resolvers";
-import {typeDefs} from "./schema";
-import { ConnectionOptions } from "tls";
-import { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
+import { typeDefs } from "./schema";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
 
 export const server = new ApolloServer({
   typeDefs,
@@ -23,12 +21,8 @@ export const server = new ApolloServer({
 
 export async function setup() {
   const config: PostgresConnectionOptions = {
-    type: "postgres",
-    host: "localhost",
-    port: Number(process.env.DB_PORT),
-    username: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
+    type:"postgres",
+    url: process.env.DB_URL,
     synchronize: true,
     logging: false,
     entities: ["src/entity/**/*.ts"],
@@ -43,6 +37,6 @@ export async function setup() {
 
   await createConnection(config);
 
-  const { url } = await server.listen();
+  const { url } = await server.listen(process.env.PORT);
   console.log(`🚀  Server ready at ${url}`);
 }

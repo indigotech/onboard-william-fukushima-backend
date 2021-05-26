@@ -5,7 +5,7 @@ import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { CompleteUserType } from "../src/dataTypes";
+import { CompleteUserType } from "../src/types-and-classes/dataTypes";
 
 import { createConnections, getConnection } from "typeorm";
 
@@ -32,8 +32,7 @@ mutation CreateUser($name: String!, $email: String!, $password: String!, $birthD
 
 describe("login and createUser w/ auth Mutations", () => {
   it("Should create a user in the database.", async () => {
-
-    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
+    token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
 
@@ -109,6 +108,7 @@ describe("createUser Mutation - Validation Error cases", () => {
       })
       .set({ Authorization: token, "Content-Type": "application/json" });
     expect(response.body.errors[0].message).to.equal("E-mail inválido.");
+    expect(response.body.errors[0].extensions.exception.code).to.equal(400);
   });
   it("Should Fail to create users - Password Error.", async () => {
     const response = await request("localhost:4000")
@@ -126,6 +126,7 @@ describe("createUser Mutation - Validation Error cases", () => {
     expect(response.body.errors[0].message).to.equal(
       "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
     );
+    expect(response.body.errors[0].extensions.exception.code).to.equal(400);
   });
   it("Should Fail to create users - Birth Date Error.", async () => {
     const response = await request("localhost:4000")
@@ -143,5 +144,6 @@ describe("createUser Mutation - Validation Error cases", () => {
     expect(response.body.errors[0].message).to.equal(
       "Data de Nascimento deve estar no formato yyyy-mm-dd"
     );
+    expect(response.body.errors[0].extensions.exception.code).to.equal(400);
   });
 });
