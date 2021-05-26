@@ -2,9 +2,9 @@ import { Server } from "http";
 import "reflect-metadata";
 import { createConnection, getConnection } from "typeorm";
 import { User } from "./src/entity/User";
+import { ApolloServer, gql } from "apollo-server";
+import * as bcrypt from "bcrypt";
 
-const { ApolloServer, gql } = require("apollo-server");
-const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const typeDefs = gql`
@@ -34,16 +34,17 @@ const typeDefs = gql`
     ): UserType!
   }
 `;
-const hello = 
-  {
-    hello: "Hello World!",
-  };
+const hello = {
+  hello: "Hello World!",
+};
 
 class ValidationError extends Error {
-  constructor(message) {
+  constructor(message, code) {
     super(message);
+    this.code = code;
     this.name = "ValidationError";
   }
+  code = 0;
 }
 
 const EMAIL_REGEX = /([a-z0-9])+@([a-z0-9])+.com/;
@@ -52,7 +53,26 @@ const BIRTHDATE_REGEX =
   /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
 
 export async function setup() {
-  await createConnection();
+  const config: any = {
+    type: "postgres",
+    host: "localhost",
+    port: process.env.DB_PORT,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    synchronize: true,
+    logging: false,
+    entities: ["src/entity/**/*.ts"],
+    migrations: ["src/migration/**/*.ts"],
+    subscribers: ["src/subscriber/**/*.ts"],
+    cli: {
+      entitiesDir: "src/entity",
+      migrationsDir: "src/migration",
+      subscribersDir: "src/subscriber",
+    },
+  };
+
+  await createConnection(config);
 
   const resolvers = {
     Query: {
@@ -65,21 +85,21 @@ export async function setup() {
         if (EMAIL_REGEX.test(args.email)) {
           user.email = args.email;
         } else {
-          throw new ValidationError("E-mail inválido.");
+          throw new ValidationError("E-mail inválido.", 400);
         }
-          if (PASSWORD_REGEX.test(args.password)) {
+        if (PASSWORD_REGEX.test(args.password)) {
           user.salt = bcrypt.genSaltSync(saltRounds);
           user.password = bcrypt.hashSync(args.password, user.salt);
         } else {
           throw new ValidationError(
-            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
+            "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.", 400
           );
         }
         if (BIRTHDATE_REGEX.test(args.birthDate)) {
           user.birthDate = args.birthDate;
         } else {
           throw new ValidationError(
-            "Data de Nascimento deve estar no formato yyyy-mm-dd"
+            "Data de Nascimento deve estar no formato yyyy-mm-dd", 400
           );
         }
         return getConnection().manager.save(user);
