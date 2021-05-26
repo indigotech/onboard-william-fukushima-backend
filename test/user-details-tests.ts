@@ -4,6 +4,7 @@ import * as request from "supertest";
 import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
 
 import { getConnection } from "typeorm";
 
@@ -12,33 +13,9 @@ var token = "";
 
 describe("User details listing test", () => {
   it("Should show details for a specified user (selected by id).", async () => {
-    const loginResponse = await request("localhost:4000")
-      .post("/")
-      .send({
-        query: `
-        mutation Login($email : String!, $password : String!, $rememberMe : Boolean){
-          login(
-            email: $email,
-            password: $password,
-            rememberMe: $rememberMe
-          )
-            {
-              user{
-                id
-                name
-                email
-                birthDate
-              }
-              token
-            }
-        }`,
-        variables: {
-          email: "admin@taqtile.com",
-          password: process.env.ADMIN_PASS,
-          rememberMe: false,
-        },
-      });
-    token = loginResponse.body.data.login.token;
+    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
     const response = await request("localhost:4000")
       .post("/")
       .send({
