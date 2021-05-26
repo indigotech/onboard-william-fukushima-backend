@@ -4,63 +4,46 @@ import * as request from "supertest";
 import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
+import { CompleteUserType } from "../src/dataTypes";
 
-import { getConnection } from "typeorm";
+import { createConnections, getConnection } from "typeorm";
 
 const expect = chai.expect;
+
 var token = "";
 
 const DUPLICATE_ERROR_TEXT = /duplicate key value violates unique constraint.*/;
+const createUser = `
+mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
+  createUser(
+    name: $name,
+    email: $email,
+    password: $password,
+    birthDate: $birthDate)
+  {
+    id
+    name
+    email
+    password
+    birthDate
+  }
+}`;
 
 describe("login and createUser w/ auth Mutations", () => {
   it("Should create a user in the database.", async () => {
-    const loginResponse = await request("localhost:4000")
-      .post("/")
-      .send({
-        query: `
-      mutation Login($email : String!, $password : String!, $rememberMe : Boolean){
-        login(
-          email: $email,
-          password: $password,
-          rememberMe: $rememberMe
-        )
-          {
-            user{
-              id
-              name
-              email
-              birthDate
-            }
-            token
-          }
-      }`,
-        variables: {
-          email: "admin@taqtile.com",
-          password: process.env.ADMIN_PASS,
-          rememberMe: false,
-        },
-      });
-    token = loginResponse.body.data.login.token;
+
+    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+
     const response = await request("localhost:4000")
       .post("/")
       .send({
-        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
-        createUser(
-          name: $name,
-          email: $email,
-          password: $password,
-          birthDate: $birthDate)
-        {
-          id
-          name
-          email
-          password
-          birthDate
-        }
-      }`,
+        query: createUser,
         variables: {
           name: "a",
-          email: "amdi@asdfasdf.com",
+          email: "a@a.com",
           password: "1234asfdf",
           birthDate: "2001-08-03",
         },
@@ -68,67 +51,46 @@ describe("login and createUser w/ auth Mutations", () => {
       .set({ Authorization: token, "Content-Type": "application/json" });
     expect(response.body.data.createUser.id).to.be.a("number");
     expect(response.body.data.createUser.name).to.equal("a");
-    expect(response.body.data.createUser.email).to.equal("amdi@asdfasdf.com");
+    expect(response.body.data.createUser.email).to.equal("a@a.com");
     expect(response.body.data.createUser.birthDate).to.equal("2001-08-03");
+
+    const createdUser: any = await getConnection().manager.findOne("User", {
+      email: "a@a.com",
+    });
+
+    expect(createdUser.id).to.equal(2);
+    expect(createdUser.name).to.equal("a");
+    expect(createdUser.email).to.equal("a@a.com");
+    expect(createdUser.birthDate).to.equal("2001-08-03");
+    expect(createdUser.salt).to.be.a("String");
+    expect(createdUser.password).to.be.a("String");
   });
 });
 
 describe("login and createUser w/ auth Mutations - Duplicate Error case", () => {
   it("Should create a duplicate user in the database.", async () => {
-    const response1 = await request("localhost:4000")
+    const user = new User();
+    user.name = "b";
+    user.email = "b@b.com";
+    user.salt = await bcrypt.genSaltSync(10);
+    user.password = await bcrypt.hashSync("1234afdsavcz", user.salt);
+    user.birthDate = "2001-09-15";
+    await getConnection().manager.save(user);
+    const response = await request("localhost:4000")
       .post("/")
       .send({
-        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
-        createUser(
-          name: $name,
-          email: $email,
-          password: $password,
-          birthDate: $birthDate)
-        {
-          id
-          name
-          email
-          password
-          birthDate
-        }
-      }`,
+        query: createUser,
         variables: {
-          name: "a",
-          email: "amdi@asdfasdf.com",
+          name: "b2",
+          email: "b@b.com",
           password: "1234asfdf",
           birthDate: "2001-08-03",
         },
       })
       .set({ Authorization: token, "Content-Type": "application/json" });
-    const response2 = await request("localhost:4000")
-      .post("/")
-      .send({
-        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
-        createUser(
-          name: $name,
-          email: $email,
-          password: $password,
-          birthDate: $birthDate)
-        {
-          id
-          name
-          email
-          password
-          birthDate
-        }
-      }`,
-        variables: {
-          name: "a",
-          email: "amdi@asdfasdf.com",
-          password: "1234asfdf",
-          birthDate: "2001-08-03",
-        },
-      })
-      .set({ Authorization: token, "Content-Type": "application/json" });
-    console.log(response2.body.errors[0].message);
-    expect(
-      DUPLICATE_ERROR_TEXT.test(response2.body.errors[0].message)
-    ).to.equal(true);
+    expect(DUPLICATE_ERROR_TEXT.test(response.body.errors[0].message)).to.equal(
+      true
+    );
   });
 });
 
@@ -137,20 +99,7 @@ describe("createUser Mutation - Validation Error cases", () => {
     const response = await request("localhost:4000")
       .post("/")
       .send({
-        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
-        createUser(
-          name: $name,
-          email: $email,
-          password: $password,
-          birthDate: $birthDate)
-        {
-          id
-          name
-          email
-          password
-          birthDate
-        }
-      }`,
+        query: createUser,
         variables: {
           name: "a",
           email: "amdiasdfasdf",
@@ -165,23 +114,10 @@ describe("createUser Mutation - Validation Error cases", () => {
     const response = await request("localhost:4000")
       .post("/")
       .send({
-        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
-      createUser(
-        name: $name,
-        email: $email,
-        password: $password,
-        birthDate: $birthDate)
-      {
-        id
-        name
-        email
-        password
-        birthDate
-      }
-    }`,
+        query: createUser,
         variables: {
-          name: "a",
-          email: "amdi@asdfasdf.com",
+          name: "c",
+          email: "c@c.com",
           password: "12345",
           birthDate: "2001-08-03",
         },
@@ -195,23 +131,10 @@ describe("createUser Mutation - Validation Error cases", () => {
     const response = await request("localhost:4000")
       .post("/")
       .send({
-        query: `mutation CreateUser($name: String!, $email: String!, $password: String!, $birthDate: String!){
-      createUser(
-        name: $name,
-        email: $email,
-        password: $password,
-        birthDate: $birthDate)
-      {
-        id
-        name
-        email
-        password
-        birthDate
-      }
-    }`,
+        query: createUser,
         variables: {
-          name: "a",
-          email: "amdi@asdfasdf.com",
+          name: "c",
+          email: "c@c.com",
           password: "1234asfdf",
           birthDate: "2001/08/03",
         },

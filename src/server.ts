@@ -1,21 +1,31 @@
 import { Server } from "http";
 import "reflect-metadata";
-import { createConnection, getConnection } from "typeorm";
+import { ContainerInterface, createConnection, DbOptions, getConnection, UseContainerOptions } from "typeorm";
 import { User } from "./entity/User";
-import { ApolloServer} from "apollo-server";
+import { ApolloServer, Config} from "apollo-server";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { isDefinitionNode } from "graphql";
 import { ValidationError, BadCredentials, NotFound } from "./errors";
 import { resolvers } from "./resolvers";
 import {typeDefs} from "./schema";
+import { ConnectionOptions } from "tls";
+import { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
+import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 
+export const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => ({
+    authScope: req.headers.authorization,
+  }),
+});
 
 export async function setup() {
-  const config: any = {
+  const config: PostgresConnectionOptions = {
     type: "postgres",
     host: "localhost",
-    port: process.env.DB_PORT,
+    port: Number(process.env.DB_PORT),
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
@@ -32,24 +42,6 @@ export async function setup() {
   };
 
   await createConnection(config);
-
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({ req }) => ({
-      authScope: req.headers.authorization,
-    }),
-  });
-
-  const admin = new User();
-  admin.email = "admin@taqtile.com";
-  admin.name = "admin";
-  admin.birthDate = "2000-01-01";
-  admin.salt = await bcrypt.genSaltSync(10);
-  admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
-  try {
-    await getConnection().manager.save(admin);
-  } catch (err) {}
 
   const { url } = await server.listen();
   console.log(`🚀  Server ready at ${url}`);
