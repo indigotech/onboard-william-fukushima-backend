@@ -12,32 +12,30 @@ const BIRTHDATE_REGEX =
   /(^(19|20)\d\d)[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])/;
 
 export const createUser = async (_, args, context) => {
-  
-  jwt.verify(context.authScope, process.env.JWT_SECRET);
 
+  jwt.verify(context.authScope, process.env.JWT_SECRET);
   const user = new User();
   user.name = args.name;
-  if (EMAIL_REGEX.test(args.email)) {
-    user.email = args.email;
-  } else {
+  if (!EMAIL_REGEX.test(args.email)) {
     throw new ValidationError("E-mail inválido.", 400);
   }
-  if (PASSWORD_REGEX.test(args.password)) {
-    user.salt = await bcrypt.genSaltSync(saltRounds);
-    user.password = await bcrypt.hashSync(args.password, user.salt);
-  } else {
+  if (!PASSWORD_REGEX.test(args.password)) {
     throw new ValidationError(
       "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra.",
       400
     );
   }
-  if (BIRTHDATE_REGEX.test(args.birthDate)) {
-    user.birthDate = args.birthDate;
-  } else {
+  if (!BIRTHDATE_REGEX.test(args.birthDate)) {
     throw new ValidationError(
       "Data de Nascimento deve estar no formato yyyy-mm-dd",
       400
     );
   }
+  
+  user.email = args.email;
+  user.salt = await bcrypt.genSaltSync(saltRounds);
+  user.password = await bcrypt.hashSync(args.password, user.salt);
+  user.birthDate = args.birthDate;
+
   return getConnection().manager.save(user);
 };
