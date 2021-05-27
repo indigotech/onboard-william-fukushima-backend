@@ -15,7 +15,7 @@ import { formatError } from "./types-and-classes/errors";
 export const server = new ApolloServer({
   typeDefs,
   resolvers,
-  formatError: formatError,
+  formatError,
   context: ({ req }) => ({
     authScope: req.headers.authorization,
   }),
