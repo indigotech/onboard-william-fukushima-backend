@@ -12,7 +12,7 @@ import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConne
 import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
 import { formatError } from "./types-and-classes/errors";
 
-export const server = new ApolloServer({
+const server = new ApolloServer({
   typeDefs,
   resolvers,
   formatError,
@@ -20,6 +20,11 @@ export const server = new ApolloServer({
     authScope: req.headers.authorization,
   }),
 });
+
+export async function shutdown(){
+  server.stop();
+  console.log(`Server stoped.`);
+}
 
 export async function setup() {
   const config: PostgresConnectionOptions = {

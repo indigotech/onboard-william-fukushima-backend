@@ -44,7 +44,7 @@ const createUserRequest = async (args) =>
 
 describe("auth createUser", () => {
   it("Should create a user in the database.", async () => {
-    token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
+    token = await jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
 
