@@ -3,10 +3,9 @@ import * as request from "supertest";
 import { gql } from "apollo-server";
 import * as jwt from "jsonwebtoken";
 import { UserType } from "../types-and-classes/dataTypes";
-import { setup, shutdown } from "../server";
 
 export const userSeeding = async () => {
-  await setup();
+
   const token = await jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
     expiresIn: "2h",
   });
@@ -38,5 +37,4 @@ export const userSeeding = async () => {
       })
       .set({ Authorization: token, "Content-Type": "application/json" });
   };
-  await shutdown();
 };

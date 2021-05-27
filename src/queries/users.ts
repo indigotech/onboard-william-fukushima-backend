@@ -10,14 +10,15 @@ export const users = async (_, args, context) => {
       `SELECT name, email, id, "birthDate"
       FROM public.user
       ORDER BY name
-      LIMIT `+ String(args.limit)
+      OFFSET ` + String(args.offset) + 
+      `LIMIT `+ String(args.limit)
       );
       const countAll = await getRepository(User).query(
         `SELECT COUNT(*) as count
         FROM public.user`
         );
-    const hasPreviousPage = (args.offset !== 0);
-    const hasNextPage = (args.offset + args.limit <= countAll.count);
+    const hasPreviousPage = ((args.offset > 0) ? true : false);
+    const hasNextPage = ( args.offset + args.limit < Number(countAll[0].count)) ? true : false;
   return {
       users: users,
       limit: args.limit,

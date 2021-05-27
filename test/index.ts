@@ -27,6 +27,8 @@ require("./user-details-tests");
 
 require("./login-test");
 
+require("./users-list-test");
+
 after(async () => {
   await getRepository(User).query('DROP TABLE "user"');
   await shutdown();
