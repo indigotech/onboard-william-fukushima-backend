@@ -9,17 +9,7 @@ import { getRepository } from "typeorm";
 
 const expect = chai.expect;
 var token = "";
-<<<<<<< HEAD
 const userQueryRequest = async (args) => await request("localhost:4000")
-=======
-
-describe("User details listing test", () => {
-  it("Should show details for a specified user (selected by id).", async () => {
-    token = await jwt.sign({ id : 1 }, process.env.JWT_SECRET, {
-      expiresIn: "2h",
-    });
-    const response = await request("localhost:4000")
->>>>>>> 2b6bb08 (Added seeding features)
       .post("/")
       .send({
         query: `query User($id: Int!){

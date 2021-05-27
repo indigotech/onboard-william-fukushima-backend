@@ -1,7 +1,3 @@
-import * as dotenv from "dotenv";
-
-dotenv.config({ path: "./.env" });
-
 import { userSeeds } from "./seeds";
 import * as request from "supertest";
 import { gql } from "apollo-server";
