@@ -6,9 +6,7 @@ import { ValidationError, BadCredentials, NotFound } from "../types-and-classes/
 
 export const user = async (_, args, context) => {
   jwt.verify(context.authScope, process.env.JWT_SECRET);
-  const user: any = (
-    await getConnection().manager.find("user", { id: args.id })
-  )[0];
+  const user = await getRepository(User).findOne({ id: args.id });
   if (!user) {
     throw new NotFound("ID não listado.");
   }
