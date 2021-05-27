@@ -1,6 +1,6 @@
 import { Server } from "http";
 import "reflect-metadata";
-import { createConnection, DbOptions, getConnection } from "typeorm";
+import { createConnection, DbOptions } from "typeorm";
 import { User } from "./entity/User";
 import { ApolloServer, Config} from "apollo-server";
 import * as bcrypt from "bcrypt";
@@ -10,10 +10,12 @@ import { resolvers } from "./resolvers";
 import { typeDefs } from "./schema";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
+import { formatError } from "./types-and-classes/errors";
 
 export const server = new ApolloServer({
   typeDefs,
   resolvers,
+  formatError: formatError,
   context: ({ req }) => ({
     authScope: req.headers.authorization,
   }),

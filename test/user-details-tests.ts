@@ -5,18 +5,11 @@ import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-
-import { getConnection } from "typeorm";
+import { getRepository } from "typeorm";
 
 const expect = chai.expect;
 var token = "";
-
-describe("User details listing test", () => {
-  it("Should show details for a specified user (selected by id).", async () => {
-    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
-      expiresIn: "2h",
-    });
-    const response = await request("localhost:4000")
+const userQueryRequest = async (args) => await request("localhost:4000")
       .post("/")
       .send({
         query: `query User($id: Int!){
@@ -30,11 +23,26 @@ describe("User details listing test", () => {
           }
         }`,
         variables: {
-          id: 1,
+          id: args.id,
         },
       })
       .set({ Authorization: token, "Content-Type": "application/json" });
-    expect(response.body.data.user.id).to.equal(1);
+
+describe("User details test", () => {
+  it("Should show details for a specified user (selected by id).", async () => {
+    const admin = new User();
+    admin.email = "admin@taqtile.com";
+    admin.name = "admin";
+    admin.birthDate = "2000-01-01";
+    admin.salt = await bcrypt.genSaltSync(10);
+    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    await getRepository(User).manager.save(admin);
+    const user: any = await getRepository(User).manager.findOne("user",{email: "admin@taqtile.com"});
+    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+    const response = await userQueryRequest({id: user.id});
+    expect(response.body.data.user.id).to.be.a("number");
     expect(response.body.data.user.name).to.equal("admin");
     expect(response.body.data.user.email).to.equal("admin@taqtile.com");
     expect(response.body.data.user.birthDate).to.equal("2000-01-01");

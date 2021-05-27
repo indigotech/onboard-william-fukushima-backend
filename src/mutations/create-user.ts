@@ -1,4 +1,4 @@
-import { getConnection } from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
@@ -21,5 +21,5 @@ export const createUser = async (_, args, context) => {
   user.password = await bcrypt.hashSync(args.password, user.salt);
   user.birthDate = args.birthDate;
 
-  return getConnection().manager.save(user);
+  return getRepository(User).manager.save(user)
 };

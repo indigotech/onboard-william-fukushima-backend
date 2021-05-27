@@ -6,12 +6,10 @@ import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
 
-import { getConnection } from "typeorm";
-
 const expect = chai.expect;
 var token = "";
 
-describe("Hello World Query", () => {
+describe("Hello World test", () => {
   it("Should respond with Hello World! json object.", async () => {
     const response = await request("localhost:4000")
       .post("/")

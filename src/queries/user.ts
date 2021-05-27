@@ -1,4 +1,4 @@
-import { createConnection, getConnection } from "typeorm";
+import { createConnection, getRepository } from "typeorm";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
@@ -10,10 +10,5 @@ export const user = async (_, args, context) => {
   if (!user) {
     throw new NotFound("ID não listado.");
   }
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    birthDate: user.birthDate,
-  };
+  return user;
 };
