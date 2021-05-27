@@ -1,7 +1,5 @@
 import * as dotenv from "dotenv";
-
 dotenv.config({ path: "./test.env" });
-
 import { User } from "../src/entity/User";
 import { setup } from "../src/server";
 import * as assert from "assert";
@@ -16,8 +14,8 @@ const expect = chai.expect;
 
 before(async () => {
   await setup();
-
 });
+
 beforeEach(async () => {
   await getRepository(User).manager.clear("user");
 });

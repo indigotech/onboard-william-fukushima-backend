@@ -1,5 +1,4 @@
 import { User } from "../src/entity/User";
-
 import * as assert from "assert";
 import * as request from "supertest";
 import { gql } from "apollo-server";
@@ -11,6 +10,7 @@ var token = "";
 
 describe("Hello World test", () => {
   it("Should respond with Hello World! json object.", async () => {
+
     const response = await request("localhost:4000")
       .post("/")
       .send({
@@ -20,8 +20,9 @@ describe("Hello World test", () => {
           }
         }`,
       });
-    await expect(response.statusCode).to.equal(200);
-    await expect(response.body)
+
+    expect(response.statusCode).to.equal(200);
+    expect(response.body)
       .to.have.property("data")
       .to.have.property("hello")
       .to.have.property("hello")

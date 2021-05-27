@@ -41,13 +41,16 @@ describe("User details test", () => {
     token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
+
     const response = await userQueryRequest({id: user.id});
+
     expect(response.body.data.user.id).to.be.a("number");
     expect(response.body.data.user.name).to.equal("admin");
     expect(response.body.data.user.email).to.equal("admin@taqtile.com");
     expect(response.body.data.user.birthDate).to.equal("2000-01-01");
   });
 });
+
 describe("User details test - fail case. ID not found", () => {
   it("Should fail to find ID.", async () => {
     const admin = new User();
@@ -60,7 +63,9 @@ describe("User details test - fail case. ID not found", () => {
     token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
+
     const response = await userQueryRequest({id: 0});
+
     expect(response.body.errors[0].message).to.equal("ID não listado.");
     expect(response.body.errors[0].httpCode).to.equal(404);
   });

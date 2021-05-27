@@ -5,7 +5,6 @@ import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-
 import { user } from "../src/queries/user";
 import { getRepository } from "typeorm";
 
@@ -48,11 +47,13 @@ describe("login test", () => {
     admin.salt = await bcrypt.genSaltSync(10);
     admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
     await getRepository(User).manager.save(admin);
+
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
       password: process.env.ADMIN_PASS,
       rememberMe: false,
     });
+
     expect(response.body.data.login.token).to.be.a("string");
     expect(response.body.data.login.user.email).to.equal("admin@taqtile.com");
     expect(response.body.data.login.user.name).to.equal("admin");
@@ -73,16 +74,19 @@ describe("login test - fail case", () => {
     admin.salt = await bcrypt.genSaltSync(10);
     admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
     await getRepository(User).manager.save(admin);
+
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
       password: "aasd",
       rememberMe: false,
     });
+
     expect(response.body.errors[0].message).to.equal(
       "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
     );
     expect(response.body.errors[0].httpCode).to.equal(400);
   });
+
   it("Should fail to login a user in the database and return ValidationError - email.", async () => {
     const admin = new User();
     admin.email = "admin@taqtile.com";
@@ -91,14 +95,17 @@ describe("login test - fail case", () => {
     admin.salt = await bcrypt.genSaltSync(10);
     admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
     await getRepository(User).manager.save(admin);
+
     const response: any = await loginRequest({
       email: "admintaqtile.com",
       password: process.env.ADMIN_PASS,
       rememberMe: false,
     });
+
     expect(response.body.errors[0].message).to.equal("E-mail inválido.");
     expect(response.body.errors[0].httpCode).to.equal(400);
   });
+
   it("Should fail to login a user in the database and return BadCredentials error - Invalid user", async () => {
     const admin = new User();
     admin.email = "admi@taqtile.com";
@@ -107,14 +114,17 @@ describe("login test - fail case", () => {
     admin.salt = await bcrypt.genSaltSync(10);
     admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
     await getRepository(User).manager.save(admin);
+
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
       password: process.env.ADMIN_PASS,
       rememberMe: false,
     });
+
     expect(response.body.errors[0].message).to.equal("Credenciais inválidas.");
     expect(response.body.errors[0].httpCode).to.equal(401);
   });
+
   it("Should fail to login a user in the database and return BadCredentials error - Wrong pass.", async () => {
     const admin = new User();
     admin.email = "admin@taqtile.com";
@@ -123,11 +133,13 @@ describe("login test - fail case", () => {
     admin.salt = await bcrypt.genSaltSync(10);
     admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
     await getRepository(User).manager.save(admin);
+
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
       password: "coxinha123",
       rememberMe: false,
     });
+
     expect(response.body.errors[0].message).to.equal("Credenciais inválidas.");
     expect(response.body.errors[0].httpCode).to.equal(401);
   });
