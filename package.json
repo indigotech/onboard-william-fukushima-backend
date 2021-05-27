@@ -6,7 +6,7 @@
    "scripts": {
       "start": "ts-node ./index.ts",
       "dev": "nodemon ./index.ts",
-      "test": "mocha --require ts-node/register ./test/*.ts"
+      "test": "mocha --require ts-node/register ./test/index.ts"
    },
    "repository": {
       "type": "git",
@@ -31,7 +31,7 @@
    },
    "devDependencies": {
       "@types/mocha": "8.2.2",
-      "@types/node": "8.0.29",
+      "@types/node": "^8.10.66",
       "chai": "4.3.4",
       "mocha": "8.4.0",
       "nodemon": "2.0.7",
