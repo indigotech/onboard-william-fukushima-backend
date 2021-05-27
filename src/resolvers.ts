@@ -1,4 +1,3 @@
-
 import {queries} from "./queries/index";
 import {mutations} from "./mutations/index";
 

@@ -1,4 +1,3 @@
-
 export interface CompleteUserType{
     id : Number,
     name : String,
