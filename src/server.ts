@@ -1,18 +1,22 @@
 import { Server } from "http";
 import "reflect-metadata";
-import { createConnection, DbOptions } from "typeorm";
+import { createConnection, DbOptions, getConnection } from "typeorm";
 import { User } from "./entity/User";
-import { ApolloServer, Config} from "apollo-server";
+import { ApolloServer, Config } from "apollo-server";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { ValidationError, BadCredentials, NotFound } from "./types-and-classes/errors";
+import {
+  ValidationError,
+  BadCredentials,
+  NotFound,
+} from "./types-and-classes/errors";
 import { resolvers } from "./resolvers";
 import { typeDefs } from "./schema";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
 import { formatError } from "./types-and-classes/errors";
 
-export const server = new ApolloServer({
+const server = new ApolloServer({
   typeDefs,
   resolvers,
   formatError,
@@ -21,9 +25,15 @@ export const server = new ApolloServer({
   }),
 });
 
+export async function shutdown() {
+  getConnection().close();
+  server.stop();
+  console.log(`Server stoped.`);
+}
+
 export async function setup() {
   const config: PostgresConnectionOptions = {
-    type:"postgres",
+    type: "postgres",
     url: process.env.DB_URL,
     synchronize: true,
     logging: false,

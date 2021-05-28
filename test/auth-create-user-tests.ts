@@ -5,7 +5,6 @@ import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { CompleteUserType } from "../src/types-and-classes/dataTypes";
 import { createConnections, getRepository } from "typeorm";
 import { argsToArgsConfig } from "graphql/type/definition";
 import { ADDRGETNETWORKPARAMS } from "dns";
@@ -44,7 +43,7 @@ const createUserRequest = async (args) =>
 
 describe("auth createUser", () => {
   it("Should create a user in the database.", async () => {
-    token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
+    token = await jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
 
@@ -74,7 +73,7 @@ describe("auth createUser", () => {
 });
 
 describe("auth createUser - Duplicate Error case", () => {
-  it("Should create a duplicate user in the database.", async () => {
+  it("Should fail to create a duplicate user in the database.", async () => {
     const user = new User();
     user.name = "b";
     user.email = "b@b.com";
@@ -98,7 +97,6 @@ describe("auth createUser - Duplicate Error case", () => {
 
 describe("auth createUser - Validation Error cases", () => {
   it("Should Fail to create users - E-mail Error.", async () => {
-
     const response = await createUserRequest({
       name: "a",
       email: "amdiasdfasdf",
@@ -111,7 +109,6 @@ describe("auth createUser - Validation Error cases", () => {
   });
 
   it("Should Fail to create users - Password Error.", async () => {
-
     const response = await createUserRequest({
       name: "c",
       email: "c@c.com",
@@ -123,11 +120,9 @@ describe("auth createUser - Validation Error cases", () => {
       "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
     );
     expect(response.body.errors[0].httpCode).to.equal(400);
-
   });
 
   it("Should Fail to create users - Birth Date Error.", async () => {
-
     const response = await createUserRequest({
       name: "c",
       email: "c@c.com",

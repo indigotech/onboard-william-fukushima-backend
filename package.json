@@ -6,7 +6,8 @@
    "scripts": {
       "start": "ts-node ./index.ts",
       "dev": "nodemon ./index.ts",
-      "test": "mocha --require ts-node/register ./test/index.ts"
+      "test": "mocha --require ts-node/register ./test/index.ts",
+      "seeds": "ts-node ./src/seeding/index.ts"
    },
    "repository": {
       "type": "git",

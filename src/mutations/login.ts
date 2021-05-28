@@ -1,17 +1,17 @@
-import { getRepository} from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { ValidationError, BadCredentials } from "../types-and-classes/errors";
-import { CompleteUserType } from "../types-and-classes/dataTypes";
 import { emailValidation, passwordValidation } from "../field-validations";
 
 export const login = async (_, args) => {
-
   emailValidation(args.email);
   passwordValidation(args.password);
-  
-  const user: any = await getRepository(User).manager.findOne("user",{email : args.email});
+
+  const user: any = await getRepository(User).manager.findOne("user", {
+    email: args.email,
+  });
   var token: string = "";
 
   if (!user) {
@@ -24,7 +24,7 @@ export const login = async (_, args) => {
     throw new BadCredentials("Credenciais inválidas.");
   }
 
-  const expirationTime = args.rememberMe ? "2 hours" : "2 weeks";
+  const expirationTime = args.rememberMe ? "2 weeks" : "2 hours";
 
   token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: expirationTime,

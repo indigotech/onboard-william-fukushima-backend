@@ -10,7 +10,6 @@ var token = "";
 
 describe("Hello World test", () => {
   it("Should respond with Hello World! json object.", async () => {
-
     const response = await request("localhost:4000")
       .post("/")
       .send({

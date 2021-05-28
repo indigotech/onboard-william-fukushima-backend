@@ -45,23 +45,52 @@ describe("login test", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
-      password: process.env.ADMIN_PASS,
+      password: "1234qwer",
       rememberMe: false,
     });
+    const tokenInfo = jwt.verify(
+      response.body.data.login.token,
+      process.env.JWT_SECRET
+    );
 
     expect(response.body.data.login.token).to.be.a("string");
     expect(response.body.data.login.user.email).to.equal("admin@taqtile.com");
     expect(response.body.data.login.user.name).to.equal("admin");
     expect(response.body.data.login.user.id).to.be.a("number");
     expect(response.body.data.login.user.birthDate).to.equal("2000-01-01");
-    expect(
-      jwt.verify(response.body.data.login.token, process.env.JWT_SECRET).id
-    ).to.be.a("number");
+    expect(tokenInfo.iat + 60 * 60 * 2).to.equal(tokenInfo.exp);
+  });
+
+  it("Should login a user in the database and return Token. (rememberMe=true)", async () => {
+    const admin = new User();
+    admin.email = "admin@taqtile.com";
+    admin.name = "admin";
+    admin.birthDate = "2000-01-01";
+    admin.salt = await bcrypt.genSaltSync(10);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
+    await getRepository(User).manager.save(admin);
+
+    const response: any = await loginRequest({
+      email: "admin@taqtile.com",
+      password: "1234qwer",
+      rememberMe: true,
+    });
+    const tokenInfo = jwt.verify(
+      response.body.data.login.token,
+      process.env.JWT_SECRET
+    );
+
+    expect(response.body.data.login.token).to.be.a("string");
+    expect(response.body.data.login.user.email).to.equal("admin@taqtile.com");
+    expect(response.body.data.login.user.name).to.equal("admin");
+    expect(response.body.data.login.user.id).to.be.a("number");
+    expect(response.body.data.login.user.birthDate).to.equal("2000-01-01");
+    expect(tokenInfo.iat + 60 * 60 * 24 * 7 * 2).to.equal(tokenInfo.exp);
   });
 });
 
@@ -72,7 +101,7 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
@@ -93,12 +122,12 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
       email: "admintaqtile.com",
-      password: process.env.ADMIN_PASS,
+      password: "1234qwer",
       rememberMe: false,
     });
 
@@ -112,12 +141,12 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
-      password: process.env.ADMIN_PASS,
+      password: "1234qwer",
       rememberMe: false,
     });
 
@@ -131,7 +160,7 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({

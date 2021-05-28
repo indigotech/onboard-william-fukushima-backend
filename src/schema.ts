@@ -26,10 +26,19 @@ export const typeDefs = gql`
     birthDate: String!
   }
 
+  type PaginatedUsersType {
+    users: [UserType]!
+    limit: Int!
+    offset: Int!
+    count: Int!
+    hasPreviousPage: Boolean!
+    hasNextPage: Boolean!
+  }
+
   type Query {
     hello: HelloResponse!
-
     user(id: Int!): UserType!
+    users(offset: Int! = 0, limit: Int! = 10): PaginatedUsersType!
   }
 
   type Mutation {
