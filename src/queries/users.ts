@@ -18,9 +18,8 @@ export const users = async (_, args, context) => {
     skip: args.offset,
     take: args.limit,
   });
-  const hasPreviousPage = args.offset > 0 ? true : false;
-  const hasNextPage =
-    args.offset + args.limit < Number(response[1]) ? true : false;
+  const hasPreviousPage = args.offset > 0;
+  const hasNextPage = args.offset + args.limit < response[1];
   return {
     users: response[0],
     limit: args.limit,
