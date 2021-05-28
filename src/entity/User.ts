@@ -4,7 +4,9 @@ import {
   Column,
   PrimaryColumn,
   Unique,
+  OneToMany,
 } from "typeorm";
+import { Address } from "./Address";
 
 @Entity()
 export class User {
@@ -25,4 +27,8 @@ export class User {
 
   @Column()
   birthDate: string;
+
+  @OneToMany(() => Address, address => address.user)
+  addresses: Address[];
+
 }
