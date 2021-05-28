@@ -39,7 +39,6 @@ const usersQueryRequest = async (args) =>
     .set({ Authorization: token, "Content-Type": "application/json" });
 
 describe("Users paginated list test", function () {
-  this.timeout(0);
   it("Should return a list of users for a specified limit and no offset.", async () => {
     await userSeeding();
     token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
