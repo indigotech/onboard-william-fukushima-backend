@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+} from "typeorm";
 import { User } from "./User";
 
 @Entity()
@@ -24,9 +31,12 @@ export class Address {
   @Column()
   state: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   complement: string;
 
-  @ManyToOne(() => User, user => user.addresses, {cascade: true, onDelete: "CASCADE"})
+  @ManyToOne(() => User, (user) => user.addresses, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   user: number;
 }

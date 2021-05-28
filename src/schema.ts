@@ -6,6 +6,7 @@ export const typeDefs = gql`
     name: String!
     email: String!
     birthDate: String!
+    addresses: [AddressType]
   }
 
   input AddressInput {
@@ -45,7 +46,7 @@ export const typeDefs = gql`
     salt: String!
     password: String!
     birthDate: String!
-    addresses : [AddressType]
+    addresses: [AddressType]
   }
 
   type PaginatedUsersType {
