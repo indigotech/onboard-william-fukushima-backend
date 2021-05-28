@@ -8,6 +8,27 @@ export const typeDefs = gql`
     birthDate: String!
   }
 
+  input AddressInput {
+    CEP: String!
+    street: String!
+    streetNumber: Int!
+    neighborhood: String!
+    city: String!
+    state: String!
+    complement: String
+  }
+
+  type AddressType {
+    id: Int!
+    CEP: String!
+    street: String!
+    streetNumber: Int!
+    neighborhood: String!
+    city: String!
+    state: String!
+    complement: String
+  }
+
   type HelloResponse {
     hello: String
   }
@@ -24,6 +45,7 @@ export const typeDefs = gql`
     salt: String!
     password: String!
     birthDate: String!
+    addresses : [AddressType]
   }
 
   type PaginatedUsersType {
@@ -47,6 +69,7 @@ export const typeDefs = gql`
       email: String!
       password: String!
       birthDate: String!
+      addresses: [AddressInput]
     ): CreateUserResponse!
 
     login(
