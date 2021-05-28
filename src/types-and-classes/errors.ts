@@ -1,32 +1,28 @@
-export class ValidationError extends Error {
+class CustomError extends Error{
   httpCode: number;
   type: string;
-  constructor(message, code) {
+  constructor(message, httpCode, name) {
     super(message);
-    this.httpCode = code;
-    this.name = "ValidationError";
+    this.httpCode = httpCode;
+    this.name = name
     this.type = "CustomError";
   }
 }
 
-export class BadCredentials extends Error {
-  httpCode: number;
-  type: string;
-  constructor(message) {
-    super(message);
-    this.httpCode = 401;
-    this.name = "BadCredentials";
-    this.type = "CustomError";
+export class ValidationError extends CustomError {
+  constructor(message, code) {
+    super(message, code, "ValidationError");
   }
 }
-export class NotFound extends Error {
-  httpCode: number;
-  type: string;
+
+export class BadCredentials extends CustomError {
   constructor(message) {
-    super(message);
-    this.httpCode = 404;
-    this.name = "NotFound";
-    this.type = "CustomError";
+    super(message, 401, "BadCredentials");
+  }
+}
+export class NotFound extends CustomError {
+  constructor(message) {
+    super(message, 404, "NotFound");
   }
 }
 
