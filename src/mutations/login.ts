@@ -3,7 +3,6 @@ import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { ValidationError, BadCredentials } from "../types-and-classes/errors";
-import { CompleteUserType } from "../types-and-classes/dataTypes";
 import { emailValidation, passwordValidation } from "../field-validations";
 
 export const login = async (_, args) => {

@@ -5,7 +5,6 @@ import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { CompleteUserType } from "../src/types-and-classes/dataTypes";
 import { createConnections, getRepository } from "typeorm";
 import { argsToArgsConfig } from "graphql/type/definition";
 import { ADDRGETNETWORKPARAMS } from "dns";
