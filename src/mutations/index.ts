@@ -1,7 +1,7 @@
-import {createUser} from "./create-user";
-import {login} from "./login"
+import { createUser } from "./create-user";
+import { login } from "./login";
 
 export const mutations = {
-    createUser: createUser,
-    login: login
-  }
+  createUser: createUser,
+  login: login,
+};

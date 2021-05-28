@@ -38,18 +38,17 @@ const usersQueryRequest = async (args) =>
     })
     .set({ Authorization: token, "Content-Type": "application/json" });
 
-
-describe("Users paginated list test", function(){
+describe("Users paginated list test", function () {
   this.timeout(0);
   it("Should return a list of users for a specified limit and no offset.", async () => {
     await userSeeding();
     token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
-        expiresIn: "2h",
-      });
+      expiresIn: "2h",
+    });
 
     const response = await usersQueryRequest({ limit: 20 });
 
-    expect(response.body.data.users.count).to.equal(20);
+    expect(response.body.data.users.count).to.equal(50);
     expect(response.body.data.users.users.length).to.equal(20);
     expect(response.body.data.users.hasNextPage).to.equal(true);
     expect(response.body.data.users.hasPreviousPage).to.equal(false);
@@ -59,10 +58,10 @@ describe("Users paginated list test", function(){
 
   it("Should return a list of users for a specified limit and middle page.", async () => {
     await userSeeding();
-    
+
     const response = await usersQueryRequest({ limit: 20, offset: 20 });
 
-    expect(response.body.data.users.count).to.equal(20);
+    expect(response.body.data.users.count).to.equal(50);
     expect(response.body.data.users.users.length).to.equal(20);
     expect(response.body.data.users.hasNextPage).to.equal(true);
     expect(response.body.data.users.hasPreviousPage).to.equal(true);
@@ -75,7 +74,7 @@ describe("Users paginated list test", function(){
 
     const response = await usersQueryRequest({ limit: 10, offset: 40 });
 
-    expect(response.body.data.users.count).to.equal(10);
+    expect(response.body.data.users.count).to.equal(50);
     expect(response.body.data.users.users.length).to.equal(10);
     expect(response.body.data.users.hasNextPage).to.equal(false);
     expect(response.body.data.users.hasPreviousPage).to.equal(true);
@@ -83,12 +82,12 @@ describe("Users paginated list test", function(){
     expect(response.body.data.users.limit).to.equal(10);
   });
 
-  it("Should return a list of users for a specified limit and no offset.", async () => {
+  it("Should return a list of users for a specified limit and last page (requesting more than existing number of queries)", async () => {
     await userSeeding();
 
     const response = await usersQueryRequest({ limit: 20, offset: 40 });
 
-    expect(response.body.data.users.count).to.equal(10);
+    expect(response.body.data.users.count).to.equal(50);
     expect(response.body.data.users.users.length).to.equal(10);
     expect(response.body.data.users.hasNextPage).to.equal(false);
     expect(response.body.data.users.hasPreviousPage).to.equal(true);

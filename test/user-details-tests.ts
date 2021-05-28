@@ -9,10 +9,11 @@ import { getRepository } from "typeorm";
 
 const expect = chai.expect;
 var token = "";
-const userQueryRequest = async (args) => await request("localhost:4000")
-      .post("/")
-      .send({
-        query: `query User($id: Int!){
+const userQueryRequest = async (args) =>
+  await request("localhost:4000")
+    .post("/")
+    .send({
+      query: `query User($id: Int!){
           user(
             id: $id)
           {
@@ -22,11 +23,11 @@ const userQueryRequest = async (args) => await request("localhost:4000")
             birthDate
           }
         }`,
-        variables: {
-          id: args.id,
-        },
-      })
-      .set({ Authorization: token, "Content-Type": "application/json" });
+      variables: {
+        id: args.id,
+      },
+    })
+    .set({ Authorization: token, "Content-Type": "application/json" });
 
 describe("User details test", () => {
   it("Should show details for a specified user (selected by id).", async () => {
@@ -35,14 +36,16 @@ describe("User details test", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
-    const user: any = await getRepository(User).manager.findOne("user",{email: "admin@taqtile.com"});
-    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
+    const user: any = await getRepository(User).manager.findOne("user", {
+      email: "admin@taqtile.com",
+    });
+    token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
 
-    const response = await userQueryRequest({id: user.id});
+    const response = await userQueryRequest({ id: user.id });
 
     expect(response.body.data.user.id).to.be.a("number");
     expect(response.body.data.user.name).to.equal("admin");
@@ -58,13 +61,13 @@ describe("User details test - fail case. ID not found", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
-    token = await jwt.sign({ id : '1' }, process.env.JWT_SECRET, {
+    token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
 
-    const response = await userQueryRequest({id: 0});
+    const response = await userQueryRequest({ id: 0 });
 
     expect(response.body.errors[0].message).to.equal("ID não listado.");
     expect(response.body.errors[0].httpCode).to.equal(404);

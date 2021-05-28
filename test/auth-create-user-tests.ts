@@ -98,7 +98,6 @@ describe("auth createUser - Duplicate Error case", () => {
 
 describe("auth createUser - Validation Error cases", () => {
   it("Should Fail to create users - E-mail Error.", async () => {
-
     const response = await createUserRequest({
       name: "a",
       email: "amdiasdfasdf",
@@ -111,7 +110,6 @@ describe("auth createUser - Validation Error cases", () => {
   });
 
   it("Should Fail to create users - Password Error.", async () => {
-
     const response = await createUserRequest({
       name: "c",
       email: "c@c.com",
@@ -123,11 +121,9 @@ describe("auth createUser - Validation Error cases", () => {
       "Senha deve conter no mínimo 7 caracteres com pelo menos um número e uma letra."
     );
     expect(response.body.errors[0].httpCode).to.equal(400);
-
   });
 
   it("Should Fail to create users - Birth Date Error.", async () => {
-
     const response = await createUserRequest({
       name: "c",
       email: "c@c.com",

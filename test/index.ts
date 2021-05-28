@@ -7,7 +7,7 @@ import * as request from "supertest";
 import { gql } from "apollo-server";
 import * as chai from "chai";
 import * as bcrypt from "bcrypt";
-import { getRepository} from "typeorm";
+import { getRepository } from "typeorm";
 
 const expect = chai.expect;
 

@@ -45,12 +45,12 @@ describe("login test", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
-      password: process.env.ADMIN_PASS,
+      password: "1234qwer",
       rememberMe: false,
     });
 
@@ -72,7 +72,7 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
@@ -93,12 +93,12 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
       email: "admintaqtile.com",
-      password: process.env.ADMIN_PASS,
+      password: "1234qwer",
       rememberMe: false,
     });
 
@@ -112,12 +112,12 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({
       email: "admin@taqtile.com",
-      password: process.env.ADMIN_PASS,
+      password: "1234qwer",
       rememberMe: false,
     });
 
@@ -131,7 +131,7 @@ describe("login test - fail case", () => {
     admin.name = "admin";
     admin.birthDate = "2000-01-01";
     admin.salt = await bcrypt.genSaltSync(10);
-    admin.password = await bcrypt.hashSync(process.env.ADMIN_PASS, admin.salt);
+    admin.password = await bcrypt.hashSync("1234qwer", admin.salt);
     await getRepository(User).manager.save(admin);
 
     const response: any = await loginRequest({

@@ -1,4 +1,4 @@
-import { getRepository} from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
@@ -7,11 +7,12 @@ import { CompleteUserType } from "../types-and-classes/dataTypes";
 import { emailValidation, passwordValidation } from "../field-validations";
 
 export const login = async (_, args) => {
-
   emailValidation(args.email);
   passwordValidation(args.password);
-  
-  const user: any = await getRepository(User).manager.findOne("user",{email : args.email});
+
+  const user: any = await getRepository(User).manager.findOne("user", {
+    email: args.email,
+  });
   var token: string = "";
 
   if (!user) {

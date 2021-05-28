@@ -26,7 +26,7 @@ export const typeDefs = gql`
     birthDate: String!
   }
 
-  type PaginatedUsersType{
+  type PaginatedUsersType {
     users: [UserType]!
     limit: Int!
     offset: Int!
@@ -38,7 +38,7 @@ export const typeDefs = gql`
   type Query {
     hello: HelloResponse!
     user(id: Int!): UserType!
-    users(offset: Int! = 0,limit: Int! = 10): PaginatedUsersType!
+    users(offset: Int! = 0, limit: Int! = 10): PaginatedUsersType!
   }
 
   type Mutation {

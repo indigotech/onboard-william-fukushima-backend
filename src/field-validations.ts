@@ -1,4 +1,4 @@
-import {ValidationError} from "./types-and-classes/errors";
+import { ValidationError } from "./types-and-classes/errors";
 
 const EMAIL_REGEX = /([a-z0-9])+@([a-z0-9])+.com(.br)?/;
 const PASSWORD_REGEX = /(?=.*[0-9])(?=.*([A-Za-z])).{7,}/;
