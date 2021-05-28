@@ -32,17 +32,19 @@ export class NotFound extends Error {
 
 export const formatError = (error: any) => {
   const originalError = error.originalError;
-  if(originalError.type === "CustomError"){
+  if (originalError.type === "CustomError") {
     return {
-      message: originalError ? originalError.message : "Ocorreu um erro na requisição.",
+      message: originalError
+        ? originalError.message
+        : "Ocorreu um erro na requisição.",
       httpCode: originalError.httpCode,
-      details: originalError? originalError.message : error.message,
-    }
-  } else{
+      details: originalError ? originalError.message : error.message,
+    };
+  } else {
     return {
       message: "Ocorreu um erro na requisição.",
       httpCode: originalError.httpCode,
-      details: originalError? originalError.message : error.message,
-    }
-  } 
-}
+      details: originalError ? originalError.message : error.message,
+    };
+  }
+};
