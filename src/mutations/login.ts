@@ -24,7 +24,7 @@ export const login = async (_, args) => {
     throw new BadCredentials("Credenciais inválidas.");
   }
 
-  const expirationTime = args.rememberMe ? "2 hours" : "2 weeks";
+  const expirationTime = args.rememberMe ? "2 weeks" : "2 hours";
 
   token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: expirationTime,

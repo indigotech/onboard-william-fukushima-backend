@@ -73,7 +73,7 @@ describe("auth createUser", () => {
 });
 
 describe("auth createUser - Duplicate Error case", () => {
-  it("Should create a duplicate user in the database.", async () => {
+  it("Should fail to create a duplicate user in the database.", async () => {
     const user = new User();
     user.name = "b";
     user.email = "b@b.com";
