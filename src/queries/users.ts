@@ -11,6 +11,7 @@ import {
 export const users = async (_, args, context) => {
   jwt.verify(context.authScope, process.env.JWT_SECRET);
   const response = await getRepository(User).findAndCount({
+    relations: ["addresses"],
     select: ["name", "email", "id", "birthDate"],
     order: {
       name: "ASC",

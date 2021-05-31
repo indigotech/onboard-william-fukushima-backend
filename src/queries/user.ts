@@ -10,7 +10,7 @@ import {
 
 export const user = async (_, args, context) => {
   jwt.verify(context.authScope, process.env.JWT_SECRET);
-  const user = await getRepository(User).findOne({ id: args.id });
+  const user = await getRepository(User).findOne({ id: args.id }, {relations:["addresses"]});
   if (!user) {
     throw new NotFound("ID não listado.");
   }
