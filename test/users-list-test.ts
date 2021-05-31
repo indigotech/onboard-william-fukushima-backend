@@ -21,6 +21,7 @@ const getUsers = async (offset, limit) =>
     },
     skip: offset,
     take: limit,
+    relations: ["addresses"],
   });
 
 const usersQueryRequest = async (args) =>
@@ -30,11 +31,21 @@ const usersQueryRequest = async (args) =>
       query: `query Users($limit: Int,$offset: Int){
         users(limit: $limit, offset: $offset){
           users{
-              id
-              name
-              email
-              birthDate
-              }
+            id
+            name
+            email
+            birthDate
+            addresses{
+              id 
+              CEP
+              street
+              streetNumber 
+              neighborhood
+              city
+              state
+              complement
+            }
+          }
           limit
           offset
           count
@@ -56,7 +67,7 @@ describe("Users paginated list test", function () {
     token = await jwt.sign({ id: "1" }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
-    
+
     const response = await usersQueryRequest({});
 
     expect(response.body.data.users.count).to.equal(50);
