@@ -25,7 +25,11 @@ export const createUser = async (_, args, context) => {
   user.salt = await bcrypt.genSaltSync(saltRounds);
   user.password = await bcrypt.hashSync(args.password, user.salt);
   user.birthDate = args.birthDate;
+
   user.addresses = args.addresses;
-  await getRepository(Address).save(args.addresses);
+
+  if (user.addresses) {
+    await getRepository(Address).save(args.addresses);
+  }
   return await getRepository(User).manager.save(user);
 };
