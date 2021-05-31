@@ -4,6 +4,7 @@ export const userSeeds = [
     email: "admin@taqtile.com",
     password: "1234qwer",
     birthDate: "1980-01-23",
+    
   },
   {
     name: "Martynas Maryam",
@@ -186,10 +187,29 @@ export const userSeeds = [
     birthDate: "1996-01-15",
   },
   {
-    name: "2Addilyn Ierameel",
-    email: "2addilyn.ierameel@gmail.com",
-    password: "uwfbyufrkjar3a3k",
-    birthDate: "1991-11-10",
+  name: "a",
+  email: "a@a.com",
+  password: "1234asfdf",
+  birthDate: "2001-08-03",
+  addresses: [
+    {
+      CEP: "02345678",
+      street: "Rua dos bobos",
+      streetNumber: 321,
+      neighborhood: "Biscoito",
+      city: "São Paulo",
+      state: "São Paulo",
+      complement: "asdasda",
+    },
+    {
+      CEP: "12345678",
+      street: "Rua Sei la",
+      streetNumber: 123,
+      neighborhood: "Bairro seila",
+      city: "São Paulo",
+      state: "São Paulo",
+    },
+  ],
   },
   {
     name: "2Margalita Saturninus",
