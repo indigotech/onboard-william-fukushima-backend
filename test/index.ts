@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config({ path: "./test.env" });
 import { User } from "../src/entity/User";
+import { Address } from "../src/entity/Address";
 import { setup, shutdown } from "../src/server";
 import * as assert from "assert";
 import * as request from "supertest";
@@ -16,7 +17,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  await getRepository(User).manager.clear("user");
+  await getRepository(User).delete({});
 });
 
 require("./hello-world-tests");
@@ -30,6 +31,7 @@ require("./login-test");
 require("./users-list-test");
 
 after(async () => {
+  await getRepository(Address).query('DROP TABLE "address"');
   await getRepository(User).query('DROP TABLE "user"');
   await shutdown();
 });
